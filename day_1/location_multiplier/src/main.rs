@@ -1,4 +1,4 @@
-use std::{fs::read_to_string, path::Path};
+use std::{collections::HashMap, fs::read_to_string, path::Path};
 
 use timer_macro::timer;
 
@@ -16,8 +16,13 @@ fn location_multiplier(input: &str) -> i32 {
         })
         .unzip();
 
-    vec1.into_iter()
-        .map(|val1| val1 * (vec2.iter().filter(|val2| *val2 == &val1).count() as i32))
+    let count_map: HashMap<i32, usize> = vec2.iter().fold(HashMap::new(), |mut acc, &val| {
+        *acc.entry(val).or_insert(0) += 1;
+        acc
+    });
+
+    vec1.iter()
+        .map(|&val1| val1 * count_map.get(&val1).cloned().unwrap_or(0) as i32)
         .sum()
 }
 
