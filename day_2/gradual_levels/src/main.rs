@@ -4,49 +4,43 @@ use timer_macro::timer;
 
 #[timer]
 fn gradual_levels(input: &str) -> usize {
-    let lines = input.lines();
-    let mut count = 0;
-    for line in lines {
-        let mut dir = 0; // 0 undef - 1 asc - 2 desc
-        let chars: Vec<i16> = line
-            .split(" ")
-            .map(|char| char.parse::<i16>().unwrap())
-            .collect();
-        for (idx, &char) in chars.iter().enumerate() {
-            if chars.len() == idx + 1 {
-                count += 1;
-                break;
-            }
-            let next = chars[idx + 1];
-            match dir {
-                0 => {
-                    dir = if char < next {
-                        if next - char > 3 || next - char < 1 {
-                            break;
-                        }
-                        1
-                    } else {
-                        if char - next > 3 || char - next < 1 {
-                            break;
-                        }
-                        2
-                    };
-                }
-                1 => {
-                    if char > next || next - char > 3 || next - char < 1 {
-                        break;
-                    }
-                }
-                2 => {
-                    if char < next || char - next > 3 || char - next < 1 {
-                        break;
-                    }
-                }
-                _ => panic!("Unknown state"),
-            }
+    input.lines().filter(|line| is_gradual_level(line)).count()
+}
+
+fn is_gradual_level(line: &str) -> bool {
+    let numbers: Result<Vec<i16>, _> = line
+        .split_whitespace()
+        .map(|char| char.parse::<i16>())
+        .collect();
+
+    match numbers {
+        Ok(nums) => verify_gradual_levels(&nums),
+        Err(_e) => false,
+    }
+}
+
+fn verify_gradual_levels(nums: &[i16]) -> bool {
+    if nums.is_empty() {
+        return false;
+    }
+
+    let mut sign = None;
+
+    for window in nums.windows(2) {
+        let diff = window[0] - window[1];
+
+        if diff.abs() < 1 || diff.abs() > 3 {
+            return false;
+        }
+
+        match sign {
+            None => sign = Some(diff.signum()),
+            Some(prev) if prev != diff.signum() => return false,
+            _ => {}
         }
     }
-    count
+
+    true
 }
 
 fn main() {
