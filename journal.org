@@ -1,0 +1,17 @@
+#+TITLE: Advent of Code 2024 Journal
+#+AUTHOR: Tim Pepper
+
+* Day 1
+** DONE Challenge 1
+This one was pretty easy, I have to imagine this was mostly to make sure people understood the puzzle format, and how to parse the test data.
+** DONE Challenge 2
+Similar to challenge 1, just some different data manipulation here.
+* Day 2
+** DONE Challenge 1
+This one absolutely kicked my butt. Huge difficulty spike on day 2. I did learn about iterator *windows* with rust, which was pretty cool. Being able to safely traverse an iterator is super smart, I wish more languages did that by default. I got hung up evaluating the first match in the list for awhile, and I sort of got lucky just searching through the test data until I found an obvious failure case. Not my best work here, but it did the thing!
+** DONE Challenge 2
+Equally challenging problem here. Despite being technically more permissive, the rules forced me to go and do multiple additional checks, removing either the first potential error index, the second, or the first value in the line to attempt to validate a "safe" code. It didn't take me as long as the challenge 1 solution to figure out, but I think that was more due to my energy level and the fact that this solution easily extended the first more than anything else.
+* Day 3
+** DONE Challenge 1
+Back to an extremely trivial challenge. I used regex crate to find the multiplier string, and its capture_iter format and function to pull out the digits, and the rest is history.
+** TODO Challenge 2
