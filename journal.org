@@ -14,4 +14,10 @@ Equally challenging problem here. Despite being technically more permissive, the
 * Day 3
 ** DONE Challenge 1
 Back to an extremely trivial challenge. I used regex crate to find the multiplier string, and its capture_iter format and function to pull out the digits, and the rest is history.
+** DONE Challenge 2
+Of course now I need to be able to index the keywords in the string... +So regex is out...+ I lied!! I just decided to full send in to regex instead. In order to solve this problem I stacked my original solution of finding the mul() blocks with a fairly complex indexing process where I found the indices of all "do", "dont", and "mul" instances, related them all to either -1, -2, or the value of the multiply, respectively, aggregated and sorted them, and then iterated over the resulting vector, adding as needed when "do" was true. I consider this a fairly janky solution, but in good Rust fashion it just worked once I got the code compiling, and it wasn't nearly as slow as I was expecting given the state of the code... Not proud, but happy!!
+
+Claude helped me rewrite my code to be a bit more idiomatic Rust-y, which is cool. I think it actually slowed my solution down some, but I am happy to be learning how to think more Rust-y.
+* Day 4
+** TODO Challenge 1
 ** TODO Challenge 2
