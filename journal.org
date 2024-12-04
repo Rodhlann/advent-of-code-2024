@@ -19,5 +19,8 @@ Of course now I need to be able to index the keywords in the string... +So regex
 
 Claude helped me rewrite my code to be a bit more idiomatic Rust-y, which is cool. I think it actually slowed my solution down some, but I am happy to be learning how to think more Rust-y.
 * Day 4
-** TODO Challenge 1
+** STRT Challenge 1
+I have put in a few iterations on this and I think I'm finally wrapping my head around the algorithm needed to solve this problem. Basically I need to search for all the Xs in the matrix, and then search in all in_bounds directions around the X for an M, if I find an M I can take that direction and look ahead for A and S. If I don't find anything on that line I need to keep searching around the X until I either find XMAS, or find nothing, and continue, counting along the way.
+
+Currently I am experiencing a lot of code duplication, but I think I should be able to get something working after stewing on this a bit.
 ** TODO Challenge 2
