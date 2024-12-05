@@ -2,7 +2,7 @@ use std::{fs::read_to_string, path::Path};
 
 use timer_macro::timer;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Direction {
     N,
     NE,
@@ -26,72 +26,99 @@ impl Direction {
         Self::NW,
     ];
 
-    fn coords(&self) -> [i32; 2] {
+    const fn coords(&self) -> (i32, i32) {
         match self {
-            Direction::N => [0, -1],
-            Direction::NE => [1, -1],
-            Direction::E => [1, 0],
-            Direction::SE => [1, 1],
-            Direction::S => [0, 1],
-            Direction::SW => [-1, 1],
-            Direction::W => [-1, 0],
-            Direction::NW => [-1, -1],
+            Direction::N => (0, -1),
+            Direction::NE => (1, -1),
+            Direction::E => (1, 0),
+            Direction::SE => (1, 1),
+            Direction::S => (0, 1),
+            Direction::SW => (-1, 1),
+            Direction::W => (-1, 0),
+            Direction::NW => (-1, -1),
         }
     }
 }
 
-fn in_bounds(x: i32, y: i32, w: usize, h: usize) -> bool {
-    x >= 0 && x < w as i32 && y >= 0 && y < h as i32
+struct PathFinder<'a> {
+    matrix: &'a Vec<Vec<char>>,
+    w: usize,
+    h: usize,
 }
 
-fn sibling_coords(x: usize, y: usize, w: usize, h: usize, dir: &Direction) -> Option<[usize; 2]> {
-    let coords = dir.coords();
-    let x1 = x as i32 + coords[0];
-    let y1 = y as i32 + coords[1];
-    if in_bounds(x1, y1, w, h) {
-        Some([x1 as usize, y1 as usize])
-    } else {
-        None
+impl<'a> PathFinder<'a> {
+    fn new(matrix: &'a Vec<Vec<char>>) -> Self {
+        PathFinder {
+            matrix,
+            w: matrix[0].len(),
+            h: matrix.len(),
+        }
+    }
+
+    fn in_bounds(&self, x: i32, y: i32) -> bool {
+        x >= 0 && x < self.w as i32 && y >= 0 && y < self.h as i32
+    }
+
+    fn get_next_coord(&self, x: usize, y: usize, dir: Direction) -> Option<(usize, usize)> {
+        let coords = dir.coords();
+        let x1 = x as i32 + coords.0;
+        let y1 = y as i32 + coords.1;
+        if self.in_bounds(x1, y1) {
+            Some((x1 as usize, y1 as usize))
+        } else {
+            None
+        }
+    }
+
+    fn find_pattern(&self, x1: usize, y1: usize, dir: Direction) -> bool {
+        const PATTERN: [char; 4] = ['X', 'M', 'A', 'S'];
+
+        let mut cx = x1;
+        let mut cy = y1;
+
+        for &ch in &PATTERN[1..] {
+            match self.get_next_coord(cx, cy, dir) {
+                Some((x2, y2)) => {
+                    if self.matrix[y2][x2] != ch {
+                        return false;
+                    }
+                    cx = x2;
+                    cy = y2;
+                }
+                None => return false,
+            }
+        }
+
+        true
+    }
+
+    fn count_xmas_patterns(&self) -> i32 {
+        let mut count = 0;
+
+        for (y, line) in self.matrix.iter().enumerate() {
+            for (x, &ch) in line.iter().enumerate() {
+                if ch == 'X' {
+                    count += Direction::VALUES
+                        .iter()
+                        .filter(|&&dir| self.find_pattern(x, y, dir))
+                        .count() as i32
+                }
+            }
+        }
+
+        count
     }
 }
-
-// TODO the reason this is currently broken is I need to continue searching if a path fails until all directions have been expended
-// I should be able to figure out a way to reduce some duplication for checking down a line of characters...
 
 #[timer]
 fn xmas_search(input: &str) -> i32 {
     let matrix: Vec<Vec<char>> = input
         .lines()
-        .map(|line| line.chars().filter(|c| !c.is_whitespace()).collect())
+        .map(|line| line.chars().filter(|ch| !ch.is_whitespace()).collect())
         .collect();
 
-    let w = matrix[0].len();
-    let h = matrix.len();
-
-    let mut count = 0;
-    for (y, line) in matrix.iter().enumerate() {
-        for (x, &ch) in line.iter().enumerate() {
-            if ch == 'X' {
-                for dir in Direction::VALUES {
-                    if let Some([x1, y1]) = sibling_coords(x, y, w, h, &dir) {
-                        if matrix[y1][x1] == 'M' {
-                            if let Some([x2, y2]) = sibling_coords(x1, y1, w, h, &dir) {
-                                if matrix[y2][x2] == 'A' {
-                                    if let Some([x3, y3]) = sibling_coords(x2, y2, w, h, &dir) {
-                                        if matrix[y3][x3] == 'S' {
-                                            count += 1;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    count
+    let path_finder = PathFinder::new(&matrix);
+    path_finder.count_xmas_patterns()
 }
 
 fn main() {

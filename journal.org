@@ -25,4 +25,6 @@ I have put in a few iterations on this and I think I'm finally wrapping my head 
 Currently I am experiencing a lot of code duplication, but I think I should be able to get something working after stewing on this a bit.
 
 This took a few rewrites to get right, but I finally got it to work! The biggest challenges I ended up having were usize math problems and bounding to the vec. I think mostly I was just overwhelmed a bit with the logic, at the end of it everything was pretty simple.
+
+Claude once again was able to help me refactor my original solution to be more Rust-y, I think it's pretty cool to have a paired programmer-esque tool that can show me the idiomatic rust way.
 ** TODO Challenge 2
