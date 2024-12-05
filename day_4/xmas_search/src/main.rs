@@ -40,29 +40,19 @@ impl Direction {
     }
 }
 
-fn in_bounds(x: usize, y: usize, w: usize, h: usize) -> bool {
-    x > 0 && x < w && y > 0 && y < h
+fn in_bounds(x: i32, y: i32, w: usize, h: usize) -> bool {
+    x >= 0 && x < w as i32 && y >= 0 && y < h as i32
 }
 
-fn get_valid_dir(
-    ch: char,
-    x: usize,
-    y: usize,
-    w: usize,
-    h: usize,
-    matrix: Vec<Vec<char>>,
-) -> Option<Direction> {
-    for dir in Direction::VALUES {
-        let x1 = (x as i32 + dir.coords()[0]) as usize;
-        let y1 = (y as i32 + dir.coords()[1]) as usize;
-        if in_bounds(x1, y1, w, h) {
-            let sib = matrix[y1][x1];
-            if sib == ch {
-                return Some(dir);
-            }
-        }
+fn sibling_coords(x: usize, y: usize, w: usize, h: usize, dir: &Direction) -> Option<[usize; 2]> {
+    let coords = dir.coords();
+    let x1 = x as i32 + coords[0];
+    let y1 = y as i32 + coords[1];
+    if in_bounds(x1, y1, w, h) {
+        Some([x1 as usize, y1 as usize])
+    } else {
+        None
     }
-    None
 }
 
 // TODO the reason this is currently broken is I need to continue searching if a path fails until all directions have been expended
@@ -82,28 +72,20 @@ fn xmas_search(input: &str) -> i32 {
     for (y, line) in matrix.iter().enumerate() {
         for (x, &ch) in line.iter().enumerate() {
             if ch == 'X' {
-                match get_valid_dir('M', x, y, w, h, matrix.clone()) {
-                    Some(dir) => {
-                        let x1 = (x as i32 + dir.coords()[0]) as usize;
-                        let y1 = (y as i32 + dir.coords()[1]) as usize;
-                        if in_bounds(x1, y1, w, h) {
-                            println!("{x1},{y1}");
-                            let sib = matrix[y1][x1];
-                            println!("{sib}");
-                            if 'A' == sib {
-                                println!("{:?}", dir);
-                                let x2 = (x as i32 + dir.coords()[0]) as usize;
-                                let y2 = (y as i32 + dir.coords()[1]) as usize;
-                                if in_bounds(x2, y2, w, h) {
-                                    let sib = matrix[y2][x2];
-                                    if 'S' == sib {
-                                        count += 1;
+                for dir in Direction::VALUES {
+                    if let Some([x1, y1]) = sibling_coords(x, y, w, h, &dir) {
+                        if matrix[y1][x1] == 'M' {
+                            if let Some([x2, y2]) = sibling_coords(x1, y1, w, h, &dir) {
+                                if matrix[y2][x2] == 'A' {
+                                    if let Some([x3, y3]) = sibling_coords(x2, y2, w, h, &dir) {
+                                        if matrix[y3][x3] == 'S' {
+                                            count += 1;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    None => (),
                 }
             }
         }
@@ -136,6 +118,17 @@ MAMMMXMMMM
 MXMXAXMASX";
 
         let result = xmas_search(input);
-        assert_eq!(2, result)
+        assert_eq!(18, result)
     }
 }
+
+// M M M S X X M A S M
+// M S A M X M S M S A
+// A M X S X M A A M M
+// M S A M A S M S M X
+// X M A S A M X A M M
+// X X A M M X X A M A
+// S M S M S A S X S S
+// S A X A M A S A A A
+// M A M M M X M M M M
+// M X M X A X M A S X
