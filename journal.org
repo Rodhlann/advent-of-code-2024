@@ -19,7 +19,7 @@ Of course now I need to be able to index the keywords in the string... +So regex
 
 Claude helped me rewrite my code to be a bit more idiomatic Rust-y, which is cool. I think it actually slowed my solution down some, but I am happy to be learning how to think more Rust-y.
 * Day 4
-** STRT Challenge 1
+** DONE Challenge 1
 I have put in a few iterations on this and I think I'm finally wrapping my head around the algorithm needed to solve this problem. Basically I need to search for all the Xs in the matrix, and then search in all in_bounds directions around the X for an M, if I find an M I can take that direction and look ahead for A and S. If I don't find anything on that line I need to keep searching around the X until I either find XMAS, or find nothing, and continue, counting along the way.
 
 Currently I am experiencing a lot of code duplication, but I think I should be able to get something working after stewing on this a bit.
@@ -27,4 +27,8 @@ Currently I am experiencing a lot of code duplication, but I think I should be a
 This took a few rewrites to get right, but I finally got it to work! The biggest challenges I ended up having were usize math problems and bounding to the vec. I think mostly I was just overwhelmed a bit with the logic, at the end of it everything was pretty simple.
 
 Claude once again was able to help me refactor my original solution to be more Rust-y, I think it's pretty cool to have a paired programmer-esque tool that can show me the idiomatic rust way.
+** DONE Challenge 2
+This one was a lot easier to grok than the first, since it was easier to target just the required coordinates instead of having to look ahead in a direction, but I still ended up getting myself turned around! I got myself in to a situation where I was over-asserting values and pre-maturely breaking out of an X check. A little troubleshooting got me there, and I learned some cool stuff about how to iterate and match in Rust!
+* Day 5
+** TODO Challenge 1
 ** TODO Challenge 2
